@@ -64,19 +64,19 @@ jobs:
       - name: Set image tag for pushes
         id: image-tag-push
         if: ${{ github.event_name == 'push' }}
-        run: echo "IMAGE_TAG=${GITHUB_REF#refs/*/}-${GITHUB_SHA}" >> $GITHUB_OUTPUT
+        run: echo "IMAGE_TAG=${GITHUB_REF#refs/*/}-${GITHUB_SHA}" >> $GITHUB_ENV
       
       # For releases use ${repo_tag} as image tag
       - name: Set image tag for release
         id: image-tag-release
         if: ${{ github.event_name == 'release' }}
-        run: echo "IMAGE_TAG=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
+        run: echo "IMAGE_TAG=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
 
       # For pull requests use ${repo_sha} as image tag
       - name: Set image tag for pr
         id: image-tag-pr
         if: ${{ github.event_name == 'pull_request' }}
-        run: echo "IMAGE_TAG=${GITHUB_SHA}" >> $GITHUB_OUTPUT
+        run: echo "IMAGE_TAG=${GITHUB_SHA}" >> $GITHUB_ENV
 
       # Build and push Docker image with Buildx (don't push on PR)
       # https://github.com/docker/build-push-action
