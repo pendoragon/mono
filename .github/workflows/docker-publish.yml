@@ -7,11 +7,10 @@ name: Docker
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ 'master', 'release-*' ]
     # Publish semver tags as releases.
     tags: [ 'v*.*.*' ]
-  pull_request:
-    branches: [ "master" ]
+  pull_request: {}
 
 env:
   # Use docker.io for Docker Hub if empty
@@ -45,13 +44,13 @@ jobs:
       # Login against a Docker registry except on PR
       # https://github.com/docker/login-action
       - name: Log into registry ${{ env.REGISTRY }}
-        if: github.event_name != 'pull_request'
         uses: docker/login-action@28218f9b04b4f3f62068d7b6ce6ca5b26e35336c
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
+      - id: git-branch
+        run: echo ""
       # Extract metadata (tags, labels) for Docker
       # https://github.com/docker/metadata-action
       - name: Extract Docker metadata
@@ -69,7 +68,23 @@ jobs:
           context: .
           file: build/dockerfiles/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: |
+            ${{ env.REGISTRY }}/${{ github.repository }}-${{ matrix.target }}:${{ env.GITHUB_REF }}-${{ env.GITHUB_SHA }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha,target={{ matrix.target }}
           cache-to: type=gha,mode=max,target={{ matrix.target }}
+
+      - name: Release images
+        id: release
+        if: ${{ env.GITHUB_REF }} == 'refs/tags/*'
+        uses: docker/build-push-action@ac9327eae2b366085ac7f6a2d02df8aa8ead720a
+        with:
+          context: .
+          file: build/dockerfiles/Dockerfile
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: |
+            ${{ env.REGISTRY }}/${{ github.repository }}-${{ matrix.target }}:${{ env.GITHUB_TAG }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha,target={{ matrix.target }}
+          cache-to: type=gha,mode=max,target={{ matrix.target }}
+
