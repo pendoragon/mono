@@ -1,9 +1,9 @@
 package main
 
-import(
+import (
 	"github.com/pendoragon/mono/libs/lib1"
 )
 
 func main() {
-	lib1.Greet()
+	lib1.Greet("world")
 }

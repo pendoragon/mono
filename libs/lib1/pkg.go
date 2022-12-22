@@ -5,5 +5,5 @@ import (
 )
 
 func Greet(s string) {
-	fmt.Printf("hello: ": s)
+	fmt.Printf("hello: %v", s)
 }
