@@ -3,10 +3,9 @@ ADD . /build
 ARG TARGETOS TARGETARCH GIT_VERSION
 ARG BINARY
 WORKDIR /build/
-RUN  make build-linux
+RUN  make build-linux TARGETS=${BINARY}
 
 FROM --platform=${BUILDPLATFORM} gcr.io/distroless/base-debian11:latest
 ARG TARGETOS TARGETARCH
-ARG BINARY
 #COPY --from=builder /build/output/bin/${TARGETOS}/${TARGETARCH}/${BINARY} /usr/local/bin/${BINARY}
-COPY --from=builder /build/apps/app1/app1 /usr/local/bin/${BINARY}
+COPY --from=builder /build/output/${BINARY} /usr/local/bin/${BINARY}
