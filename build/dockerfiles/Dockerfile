@@ -9,4 +9,4 @@ FROM --platform=${BUILDPLATFORM} gcr.io/distroless/base-debian11:latest
 ARG TARGETOS TARGETARCH
 ARG BINARY
 #COPY --from=builder /build/output/bin/${TARGETOS}/${TARGETARCH}/${BINARY} /usr/local/bin/${BINARY}
-COPY ./apps/app1/app1 /usr/local/bin/${BINARY}
+COPY --from=builder /build/apps/app1/app1 /usr/local/bin/${BINARY}
