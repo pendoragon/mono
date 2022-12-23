@@ -3,7 +3,7 @@ ADD . /build
 ARG TARGETOS TARGETARCH GIT_VERSION
 ARG BINARY
 WORKDIR /build/
-RUN  make build-linux TARGETS=${BINARY}
+RUN  make build-linux TARGETS=${BINARY} ARCH=${TARGETARCH}
 
 FROM --platform=${BUILDPLATFORM} gcr.io/distroless/base-debian11:latest
 ARG TARGETOS TARGETARCH
