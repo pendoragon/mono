@@ -99,7 +99,7 @@ jobs:
             BINARY=${{ matrix.target }}
           tags: |
             ${{ env.REGISTRY_GITHUB }}/${{ github.repository }}-${{ matrix.target }}:${{ env.IMAGE_TAG }}
-            ${{ env.REGISTRY_DOCKERHUB }}/${{ secrets.DOCKERHUB_USERNAME }}/${{ github.repository }}-${{ matrix.target }}:${{ env.IMAGE_TAG }}
+            ${{ env.REGISTRY_DOCKERHUB }}/${{ secrets.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}-${{ matrix.target }}:${{ env.IMAGE_TAG }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha,target={{ matrix.target }}
           cache-to: type=gha,mode=max,target={{ matrix.target }}
