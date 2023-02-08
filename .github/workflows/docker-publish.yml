@@ -15,7 +15,8 @@ on:
 
 env:
   # Use docker.io for Docker Hub if empty
-  REGISTRY: ghcr.io
+  REGISTRY_GITHUB: ghcr.io
+  REGISTRY_DOCKERHUB: docker.io
   # github.repository as <account>/<repo>
   # IMAGE_NAME: ${{ github.repository }}
 
@@ -44,12 +45,18 @@ jobs:
 
       # Login against a Docker registry except on PR
       # https://github.com/docker/login-action
-      - name: Log into registry ${{ env.REGISTRY }}
+      - name: Log into registry ${{ env.REGISTRY_GITHUB }}
         uses: docker/login-action@28218f9b04b4f3f62068d7b6ce6ca5b26e35336c
         with:
-          registry: ${{ env.REGISTRY }}
+          registry: ${{ env.REGISTRY_GITHUB }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Log into registry ${{ env.REGISTRY_DOCKERHUB }}
+        uses: docker/login-action@28218f9b04b4f3f62068d7b6ce6ca5b26e35336c
+        with:
+          registry: ${{ env.REGISTRY_DOCKERHUB }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       # Extract metadata (tags, labels) for Docker
       # https://github.com/docker/metadata-action
@@ -57,7 +64,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
         with:
-          images: ${{ env.REGISTRY }}/${{ github.repository }}-${{ matrix.target }}
+          images: ${{ env.REGISTRY_GITHUB }}/${{ github.repository }}-${{ matrix.target }}
 
       # For pushes on main or release-* branch,
       # use ${repo_branch_name}-${commit_sha} as image tag
@@ -91,7 +98,8 @@ jobs:
           build-args: |
             BINARY=${{ matrix.target }}
           tags: |
-            ${{ env.REGISTRY }}/${{ github.repository }}-${{ matrix.target }}:${{ env.IMAGE_TAG }}
+            ${{ env.REGISTRY_GITHUB }}/${{ github.repository }}-${{ matrix.target }}:${{ env.IMAGE_TAG }}
+            ${{ env.REGISTRY_DOCKERHUB }}/${{ github.repository }}-${{ matrix.target }}:${{ env.IMAGE_TAG }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha,target={{ matrix.target }}
           cache-to: type=gha,mode=max,target={{ matrix.target }}
